@@ -1,0 +1,139 @@
+/* Page container */
+.choice-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  padding: 2rem;
+  gap: 2rem;
+  box-sizing: border-box;
+}
+
+/* Logo */
+#logo {
+  width: auto;
+  height: 160px;
+  object-fit: contain;
+  margin-bottom: 2rem;
+}
+
+/* Layout of choice section */
+.login-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  height: auto;
+  width: 90vw;
+  max-width: 1200px;
+  position: relative;
+}
+
+/* When selected, layout becomes grid with two sections */
+.role-selected {
+  display: flex;
+  grid-template-columns: 300px 1fr;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cards */
+.choice-container {
+  box-sizing: border-box;
+  width: 300px;
+  height: 391px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.4s ease;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center top;
+  z-index: 1;
+}
+
+/* Hover */
+.choice-container:hover {
+  transform: scale(1.05);
+}
+
+/* Only selected card stays visible */
+.choice-container.selected {
+  grid-column: 1;
+  transform: scale(1.05);
+}
+
+.choice-container.hide {
+  display: none;
+}
+
+/* Login form next to selected card */
+.popup-login {
+  animation: fadeIn 0.7s ease-in-out;
+  z-index: 1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Role colors */
+.parent {
+  background-color: #3E4E88;
+  border: 3px solid #91A6FF;
+  color: #F4F6FB;
+}
+
+.teacher {
+  background-color: #237E6F;
+  border: 3px solid #66C2A5;
+  color: #F3FAF8;
+}
+
+.student {
+  background-color: #FF7F50;
+  border: 3px solid #FFD580;
+  color: #FFF9F2;
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  .login-choice,
+  .role-selected {
+    height: 300px;
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap:1rem;
+  }
+
+  .choice-container,
+  .choice-container.selected {
+    width: 90vw;
+    height: 200px;
+    font-size: 1.2rem;
+  }
+
+  .popup-login {
+    width: 90vw;
+  }
+
+  #logo {
+    height: 100px;
+
+  }
+}
