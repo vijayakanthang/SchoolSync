@@ -1,32 +1,110 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import HomePage from './pages/HomePage';
-import Register from './pages/Register';
-import LoginChoice from './pages/LoginChoice';
+import { useEffect, useState } from 'react';
 
-function PrivateRoute({ children }) {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/" />;
-}
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function App() {
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('password');
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [me, setMe] = useState(null);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setToken(data.token);
+        localStorage.setItem('token', data.token);
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error');
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    const fetchMe = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setMe(data);
+        } else {
+          setMe(null);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchMe();
+  }, [token]);
+
+  if (!token || !me) {
+    return (
+      <div style={{ maxWidth: 400, margin: '40px auto', fontFamily: 'sans-serif' }}>
+        <h1>SchoolSync Login</h1>
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: 12 }}>
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ width: '100%', padding: 8 }}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ width: '100%', padding: 8 }}
+            />
+          </div>
+          <button type="submit" style={{ padding: '8px 16px' }}>
+            Login
+          </button>
+        </form>
+        <p style={{ marginTop: 16, fontSize: 12 }}>
+          Demo: any email/password will log in as an ADMIN user.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LoginChoice />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <HomePage />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <div style={{ maxWidth: 800, margin: '40px auto', fontFamily: 'sans-serif' }}>
+      <h1>SchoolSync Admin Dashboard</h1>
+      <p>Logged in as {me.email} ({me.role})</p>
+      <button
+        onClick={() => {
+          localStorage.removeItem('token');
+          setToken('');
+          setMe(null);
+        }}
+        style={{ padding: '6px 12px', marginBottom: 24 }}
+      >
+        Logout
+      </button>
+      <hr />
+      <h2>Next: CRM Leads, Attendance, Tests...</h2>
+      <p>
+        This is the core & auth pack. You can now add protected pages for CRM, attendance, tests, etc.
+      </p>
+    </div>
   );
 }
 
