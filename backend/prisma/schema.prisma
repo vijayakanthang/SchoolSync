@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+
+  Student   Student?
+  Parent    Parent?
+  Teacher   Teacher?
+}
+
+model Student {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  className      String
+  section        String
+  rollNumber     String
+  primaryParent  Parent?   @relation(fields: [primaryParentId], references: [id])
+  primaryParentId String?
+
+  activities     Activity[]
+}
+
+model Parent {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  phone     String
+  occupation String?
+
+  students  Student[]
+}
+
+model Teacher {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  subject   String
+  experience Int?
+}
+
+model Lead {
+  id           String   @id @default(cuid())
+  name         String
+  contactEmail String
+  contactPhone String
+  stage        LeadStage @default(NEW)
+  source       String?
+  createdById  String
+  createdAt    DateTime @default(now())
+}
+
+model Activity {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  type        ActivityType
+  student     Student?    @relation(fields: [studentId], references: [id])
+  studentId   String?
+  createdById String
+  createdAt   DateTime    @default(now())
+}
+
+enum Role {
+  STUDENT
+  PARENT
+  TEACHER
+  ADMIN
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  INTERVIEW
+  ADMITTED
+  LOST
+}
+
+enum ActivityType {
+  CALL
+  MEETING
+  EMAIL
+  CHAT
+  ATTENDANCE
+  TEST
+  NOTE
+}
