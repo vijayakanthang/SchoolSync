@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AdminLeads } from './pages/AdminLeads';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -7,6 +8,7 @@ function App() {
   const [password, setPassword] = useState('password');
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [me, setMe] = useState(null);
+  const [view, setView] = useState('dashboard');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -86,8 +88,8 @@ function App() {
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: '40px auto', fontFamily: 'sans-serif' }}>
-      <h1>SchoolSync Admin Dashboard</h1>
+    <div style={{ maxWidth: 1000, margin: '40px auto', fontFamily: 'sans-serif' }}>
+      <h1>SchoolSync Admin</h1>
       <p>Logged in as {me.email} ({me.role})</p>
       <button
         onClick={() => {
@@ -99,11 +101,24 @@ function App() {
       >
         Logout
       </button>
-      <hr />
-      <h2>Next: CRM Leads, Attendance, Tests...</h2>
-      <p>
-        This is the core & auth pack. You can now add protected pages for CRM, attendance, tests, etc.
-      </p>
+
+      <nav style={{ marginBottom: 24 }}>
+        <button onClick={() => setView('dashboard')} style={{ marginRight: 8 }}>
+          Dashboard
+        </button>
+        <button onClick={() => setView('leads')}>
+          CRM Leads
+        </button>
+      </nav>
+
+      {view === 'dashboard' && (
+        <div>
+          <h2>Dashboard</h2>
+          <p>Welcome to the admin dashboard. You can manage CRM leads and, later, attendance, tests, and more.</p>
+        </div>
+      )}
+
+      {view === 'leads' && <AdminLeads />}
     </div>
   );
 }
